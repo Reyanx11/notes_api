@@ -1,48 +1,22 @@
-
 from .models import Notes
 from .serializer import NotesSerializer
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from django.http import Http404
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from .permissions import IsOwnerOrReadOnly
 
-@api_view(['GET','POST'])
-def note_list(request):
-    if request.method == 'GET':
+class NoteList(generics.ListCreateAPIView):
+    queryset = Notes.objects.all()
+    serializer_class = NotesSerializer
 
-        notes = Notes.objects.all()
-        serializer = NotesSerializer(notes, many = True)
-        return Response(serializer.data)
-    
-    elif request.method == 'POST':
-        
-        serializer = NotesSerializer(data = request.data)
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors)
-    
-@api_view(['GET','PUT','DELETE'])
-def note_details(request, pk):
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
-    try:
-        note = Notes.objects.get(pk = pk)
-    except Notes.DoesNotExist:
-        raise Http404
-    
-    if request.method == 'GET':
-        serializer = NotesSerializer(note)
-        return Response(serializer.data)
-    
-    elif request.method == 'PUT':
+class NoteDetails(generics.RetrieveUpdateDestroyAPIView):
 
-        serializer = NotesSerializer(note, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors)
+    queryset = Notes.objects.all()
+    serializer_class = NotesSerializer
+
+    permission_classes = [IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly]
     
-    elif request.method == 'DELETE':
-        note.delete()
-        return Response(status = 204)
-        
