@@ -8,7 +8,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         fields = ["url", "username"]
 
         extra_kwargs = {
-            "url": {"view_name": "user_detail"}
+            "url": {"view_name": "user-detail"}
         }
 
     def create(self,validated_data):

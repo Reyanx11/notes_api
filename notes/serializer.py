@@ -4,7 +4,7 @@ from rest_framework import serializers
 class NotesSerializer(serializers.HyperlinkedModelSerializer):
 
     author = serializers.HyperlinkedRelatedField(
-        view_name = "user_detail",
+        view_name = "user-detail",
         read_only = True
     )
 
@@ -12,5 +12,5 @@ class NotesSerializer(serializers.HyperlinkedModelSerializer):
         model = Notes
         fields = ["url", "title", "content", "author", "is_public"]
         extra_kwargs = {
-            "url" : {"view_name": "note_details"}
+            "url" : {"view_name": "notes-detail"}
         }
