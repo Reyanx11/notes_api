@@ -1,10 +1,16 @@
 from .models import Notes
 from rest_framework import serializers
 
-class NotesSerializer(serializers.ModelSerializer):
+class NotesSerializer(serializers.HyperlinkedModelSerializer):
 
-    author = serializers.ReadOnlyField(source = "author.username")
+    author = serializers.HyperlinkedRelatedField(
+        view_name = "user_detail",
+        read_only = True
+    )
 
     class Meta:
         model = Notes
-        fields = '__all__'
+        fields = ["url", "title", "content", "author", "is_public"]
+        extra_kwargs = {
+            "url" : {"view_name": "note_details"}
+        }
